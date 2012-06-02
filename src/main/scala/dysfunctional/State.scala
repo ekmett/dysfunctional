@@ -12,7 +12,7 @@ object State {
     def get(implicit e: State[S]) = e.state
     def put(s: S)(implicit e: State[S]) { e.state = s }
     def modify(f: S => S)(implicit e: State[S]) { e.state = f(e.state) }
-    def withState(s: S)(f: State[S] => A) = f(new StateEnv[S](s))
+    def withState(s: S)(f: State[S] => A) = f(new State[S](s))
   }
   def module[S] = new Module[S]
 }
