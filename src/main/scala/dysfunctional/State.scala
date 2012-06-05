@@ -1,9 +1,9 @@
 package dysfunctional
 
-trait State {
+trait State { that =>
   type S
   var state: S
-  type Store = State { S = S }
+  type Store = State { type S = that#S }
   def get = state
   def put(s: S) { state = s }
   def modify(f: S => S) { state = f(state) }
