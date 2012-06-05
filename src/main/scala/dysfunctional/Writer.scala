@@ -1,7 +1,13 @@
 package dysfunctional
 
-class Writer[M](var log: M)(implicit M: Monoid[M]) {
+trait Writer { my =>
+  type M
+  type Log = Writer { type M = my#M }
+
+  val M : Monoid[M]
   import M._
+
+  var log: M
   def tell(m: M) { log = append(log,m) }
   def listen[A](go: => A): (A,M) = {
     val old = log
@@ -22,12 +28,10 @@ class Writer[M](var log: M)(implicit M: Monoid[M]) {
 }
 
 object Writer {
-  class Module[M] {
-    type Log = Writer[M]
-    def tell(m: M)(implicit w: Log) = w.tell(m)
-    def listen(go: => A)(implicit w: Log): (A,M)
-    def pass(go: => (A, M => M))(implicit w: Log): (A,M)
+  def run[W,A](f: Writer { type M = W } => A)(implicit W: Monoid[W]) = {
+    f(new Writer {
+      val M = W
+      var log = M.empty
+    })
   }
-  def module[M] = new Module[M]
 }
-
